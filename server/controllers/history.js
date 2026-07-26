@@ -1,0 +1,55 @@
+import video from "../Modals/video.js";
+import history from "../Modals/history.js";
+export const handlehistory = async (req, res) => {
+  const { userId } = req.body;
+  const { videoid } = req.params;
+  try {
+    const alreadyExists = await history.findOneAndUpdate(
+  {
+    viewer: userId,
+    videoid: videoid,
+  },
+  {
+    viewer: userId,
+    videoid: videoid,
+    updatedAt: new Date(),
+  },
+  {
+    upsert: true,
+    new: true,
+  }
+)
+    await video.findByIdAndUpdate(videoid, {
+      $inc: { views: 1 },
+    });
+    return res.status(200).json({ history: true });
+  } catch (error) {
+    console.error("error:", error);
+    return res.status(500).json({
+      message: "Something went wrong",
+    });
+  }
+};
+export const handleview = async (req, res) => {
+  const { videoid } = req.params;
+  try {
+    await video.findByIdAndUpdate(videoid, { $inc: { views: 1 } });
+  } catch (error) {
+    console.error(" error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+export const getallhistoryVideo = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const historyvideo = await history
+      .find({ viewer: userId })
+      .populate("videoid")
+      .sort({updatedAt: -1})
+      .exec();
+    return res.status(200).json(historyvideo);
+  } catch (error) {
+    console.error(" error:", error);
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
