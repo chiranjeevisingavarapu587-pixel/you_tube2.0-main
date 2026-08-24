@@ -21,7 +21,7 @@ export default function Subscriptions() {
   ];
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">Subscriptions</h1>
+      <h1 className="text-2xl font-semibold mb-6 ">Subscriptions</h1>
       <div className="space-y-4">
         {channels.map((channel, index) => (
           <div

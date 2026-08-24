@@ -18,6 +18,7 @@ import { useUser } from "@/lib/AuthContext";
 export default function HistoryContent() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { user } = useUser();
   console.log(user?._id)
   useEffect(() => {
@@ -83,47 +84,66 @@ export default function HistoryContent() {
 
       <div className="space-y-4">
         {history.map((item) => (
-          <div key={item._id} className="flex gap-4 group">
-            <Link href={item.videoid?._id ? `/watch/${item.videoid._id}`:"#"} className="flex-shrink-0">
-             <div className="flex gap-4 mb-4">
+          <div key={item._id} className="flex w-full min-w-0 items-start gap-2 sm:gap-4 group">
+            <Link href={item.videoid?._id ? `/watch/${item.videoid._id}`:"#"} className="flex min-w-0 flex-1">
+             <div className="flex min-w-0 gap-2 sm:gap-4 mb-4">
               {/* Thumbnail */}
               {item.videoid?.thumbnail && (
               <img
               src={`/video/${item.videoid.thumbnail}`}
-              className="w-40 h-24 object-cover rounded"
+              className="w-28 h-20 sm:w-40 sm:h-24 object-cover rounded flex-shrink-0"
               />
               )}
               {/* Video Details */}
-              <div className="flex flex-col">
-              <h3 className="font-medium text-sm line-clamp-2">
+              <div className="flex flex-col min-w-0 flex-1">
+              <h3 className="font-medium text-sm sm:text-base line-clamp-2 break-words">
              {item.videoid?.title}
               </h3>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 truncate">
               {item.videoid?.views?.toLocaleString()} views •{" "}
               {item.videoid?.updatedAt ? formatDistanceToNow(new Date(item.videoid.updatedAt)): "Recently"} ago
               </p>
               </div>
               </div>
                </Link>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="opacity-0 group-hover:opacity-100"
-                >
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => handleRemoveFromHistory(item._id)}
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Remove from watch history
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+             <DropdownMenu
+  open={openMenu === item._id}
+  onOpenChange={(open) =>
+    setOpenMenu(open ? item._id : null)
+  }
+>
+  <DropdownMenuTrigger asChild>
+    <Button
+      variant="ghost"
+      size="icon"
+      className="flex-shrink-0 opacity-100"
+    >
+      <MoreVertical className="w-4 h-4" />
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="end">
+    <div className="flex items-center gap-4 px-2 py-1">
+      <button
+        type="button"
+        onClick={() => setOpenMenu(null)}
+        className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+      >
+        <X className="w-5 h-5" />
+      </button>
+      {/* Remove - Remove from history */}
+      <button
+        type="button"
+        onClick={() => {
+          handleRemoveFromHistory(item._id);
+          setOpenMenu(null);
+        }}
+        className="whitespace-nowrap rounded px-1 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
+      >
+        Remove from watch history
+      </button>
+    </div>
+  </DropdownMenuContent>
+</DropdownMenu>
           </div>
         ))}
       </div>

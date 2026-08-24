@@ -1,14 +1,19 @@
 import Header from "@/components/Header";
+import FloatingCall from "@/components/FloatingCall";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { ThemeProvider } from "../lib/theme-provider";
 import Sidebar from "@/components/Sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { UserProvider } from "../lib/AuthContext";
+import { CallProvider } from "@/lib/CallContext";
 import { minutesInHour } from "date-fns/constants";
 import { socket } from "@/lib/socket";
 export default function App({ Component, pageProps }: AppProps) {
+  const router=useRouter();
+  const isCallPage=router.pathname.startsWith("/call/");
   useEffect(() => {
     console.log("APP TSX RUNNING");
   const setTheme = async () => {
@@ -62,20 +67,31 @@ useEffect(() => {
     <ThemeProvider attribute="class"
     defaultTheme="light"
     enableSystem={false}>
+      <CallProvider>
     <UserProvider>
       <div className="min-h-screen bg-white text-black dark:bg-black dark:text-white overflow-x-hidden">
-        <Header />
         <Toaster />
-        <div className="flex">
-          <div className="hidden md:block flex-shrink-0">
-            <Sidebar />
-          </div>
-          <main className="flex-1 min-w-0 overflow-x-hidden">
-            <Component {...pageProps} />
-          </main>
+
+{isCallPage ? (
+  <Component {...pageProps} />
+) : (
+  <>
+    <Header />
+
+    <div className="flex">
+      <Sidebar />
+
+      <main className="flex-1 min-w-0 overflow-x-hidden">
+        <Component {...pageProps} />
+      </main>
+    </div>
+
+    <FloatingCall />
+  </>
+)}
         </div>
-      </div>
     </UserProvider>
+    </CallProvider>
     </ThemeProvider>
   );
 }

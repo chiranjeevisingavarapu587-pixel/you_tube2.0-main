@@ -4,7 +4,7 @@ interface RelatedVideosProps {
   videos: Array<{
     _id: string;
     videotitle: string;
-    videochanel: string;
+    videochannel: string;
     views: number;
     createdAt: string;
   }>;
@@ -29,7 +29,7 @@ export default function RelatedVideos({ videos }: RelatedVideosProps) {
             <h3 className="line-clamp-2 text-sm font-semibold transition-colors group-hover:text-blue-600">
               {video.videotitle}
             </h3>
-            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{video.videochanel}</p>
+            <p className="mt-1 text-xs text-gray-600 dark:text-gray-400">{video.videochannel}</p>
             <p className="text-xs text-gray-600 dark:text-gray-400">
               {video.views.toLocaleString()} views •{" "}
               {video?.createdAt ? formatDistanceToNow(new Date(video.createdAt)) + " ago":""}

@@ -7,37 +7,37 @@ export default function Explore() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         <div
           onClick={() => router.push("/search?q=trending")}
-          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer"
+          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer dark:text-black"
         >
           🔥 Trending
         </div>
         <div
           onClick={() => router.push("/search?q=music")}
-          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer"
+          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer dark:text-black"
         >
           🎵 Music
         </div>
         <div
           onClick={() => router.push("/search?q=gaming")}
-          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer"
+          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer dark:text-black"
         >
           🎮 Gaming
         </div>
         <div
           onClick={() => router.push("/search?q=news")}
-          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer"
+          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer dark:text-black"
         >
           📰 News
         </div>
         <div
           onClick={() => router.push("/search?q=movies")}
-          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer"
+          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer dark:text-black"
         >
           🎬 Movies
         </div>
         <div
           onClick={() => router.push("/search?q=sports")}
-          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer"
+          className="bg-gray-100 p-6 rounded-lg text-center hover:bg-gray-200 cursor-pointer dark:text-black"
         >
           ⚽ Sports
         </div>

@@ -18,7 +18,7 @@ useEffect(() => {
     try {
       const res = await axiosInstance.get(`/video/${id}`);
       console.log("VIDEO OBJECT:", res.data);
-      console.log("Channel:", res.data.videochanel);
+      console.log("Channel:", res.data.videochannel);
       setVideo(res.data);
       const related = await axiosInstance.get("/video/getall");
       console.log("RESPONSE DATA:", related.data);
@@ -49,7 +49,7 @@ useEffect(() => {
 }
   return (
   <div className="w-full max-w-screen-2xl mx-auto px-2 sm:px-4 lg:px-6 py-3">
-    <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_380px] gap-6">
+    <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,2.3fr)_360px] gap-6">
 
       {/* Left Section */}
       <div className="min-w-0">

@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 export default function PremiumPage() {
   const router = useRouter();
+  const API_HOST =
+    process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -22,7 +24,9 @@ export default function PremiumPage() {
       name: `YouTube ${plan}`,
       description: `${plan} Subscription`,
       handler: async function (response: any) {
-        await axios.post("http://localhost:5000/premium/update", {
+        console.log("API HOST:", API_HOST);
+        console.log("PREMIUM API:", `${process.env.NEXT_PUBLIC_BACKEND_URL}/premium/update`);
+        await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/premium/update`, {
           userId: localStorage.getItem("userId"), plan: plan.toLowerCase(),
         });
         console.log("API Success");
@@ -31,6 +35,7 @@ export default function PremiumPage() {
           "plan",
           plan.toLowerCase()
         );
+        router.back();
         const expiryDate = new Date();
         expiryDate.setMonth(
           expiryDate.getMonth() + 1
@@ -77,7 +82,7 @@ export default function PremiumPage() {
           </p>
           <ul className="space-y-3 text-gray-200 mb-6">
             <li>☑ 7 Minutes Watch Time</li>
-            <li>☑ Limited Downloads</li>
+            <li>☑ Unlimited Downloads</li>
             <li>☑ Basic Support</li>
           </ul>
           <button
@@ -105,8 +110,8 @@ export default function PremiumPage() {
             </span>
           </p>
           <ul className="space-y-3 text-white mb-6">
-            <li>☑ 30 Minutes Watch Time</li>
-            <li>☑ 10 Downloads / day</li>
+            <li>☑ 10 Minutes Watch Time</li>
+            <li>☑ Unlimited Downloads</li>
             <li>☑ Priority Support</li>
           </ul>
           <button

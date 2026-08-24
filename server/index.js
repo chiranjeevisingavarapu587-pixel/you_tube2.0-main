@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
+import http from "http";
+
 import userroutes from "./routes/auth.js";
 import videoroutes from "./routes/video.js";
 import likeRoutes from "./routes/like.js";
@@ -11,45 +13,48 @@ import downloadRoutes from "./routes/download.js";
 import historyrroutes from "./routes/history.js";
 import commentroutes from "./routes/comment.js";
 import premiumroutes from "./routes/premium.js";
-import http from "http";
 import { Server } from "socket.io";
 import callroutes from "./routes/call.js";
+
 dotenv.config();
-console.log("EMAIL_USER=", process.env.EMAIL_USER);
-console.log("EMAIL_PASS=", process.env.EMAIL_PASS);
-console.log("EMAIL_PASS LENGTH:", process.env.EMAIL_PASS?.length);
-import path from "path";
-import {fileURLToPath} from "url";
-const __filename=fileURLToPath(import.meta.url);
-const __dirname=path.dirname(__filename);
+
 const app = express();
+
 const server = http.createServer(app);
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://localhost:3000",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 const io = new Server(server, {
   cors: {
-    origin: [
-    "http://localhost:3000",
-    "http://192.168.43.57:3000",
-    ],
+    origin: allowedOrigins,
     credentials: true,
   },
 });
+
 app.use(
   cors({
-    origin:["http://localhost:3000",
-    "http://192.168.43.57:3000",
-    ],
-    credentials:true,
+    origin: allowedOrigins,
+    credentials: true,
   })
 );
+
 app.use(express.json({ limit: "30mb", extended: true }));
-app.use("/call", callroutes);
 app.use(express.urlencoded({ limit: "30mb", extended: true }));
-app.use("/download", downloadRoutes)
+
+app.use("/call", callroutes);
+app.use("/download", downloadRoutes);
 app.use("/uploads", express.static("uploads"));
+
 app.get("/", (req, res) => {
   res.send("Youtube backend is working");
 });
+
 app.use(bodyParser.json());
+
 app.use("/user", userroutes);
 app.use("/video", videoroutes);
 app.use("/likes", likeRoutes);
@@ -57,8 +62,10 @@ app.use("/watch", watchlaterroutes);
 app.use("/history", historyrroutes);
 app.use("/comment", commentroutes);
 app.use("/premium", premiumroutes);
+
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
 io.on("connection", (socket) => {

@@ -13,7 +13,8 @@ import { MoreVertical, X } from "lucide-react"
 import axiosInstance from "@/lib/axiosInstance"
 import { useUser } from "@/lib/AuthContext"
 export default function LikedVideosContent() {
-  const [likedVideos, setLikedVideos] = useState<any[]>([])
+  const [likedVideos, setLikedVideos] = useState<any[]>([]);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { user } = useUser()
   useEffect(() => {
     if (user) {
@@ -43,23 +44,23 @@ export default function LikedVideosContent() {
     }
   }
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-6">Liked videos</h1>
+    <div className="p-4 sm:p-6">
+      <h1 className="text-2xl font-semibold mb-4 sm:mb-6">Liked videos</h1>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {likedVideos
         .filter((item: any)=> item.videoid)
         .map((item: any) => (
           <div
             key={item._id}
-            className="flex gap-4 group"
+            className="flex w-full min-w-0 gap-2 sm:gap-4 group"
           >
             {/* Thumbnail */}
             <Link
               href={`/watch/${item.videoid?._id}`}
               className="flex-shrink-0"
             >
-              <div className="relative w-40 aspect-video bg-gray-100 rounded overflow-hidden">
+              <div className="relative w-28 sm:w-40 aspect-video bg-gray-100 rounded overflow-hidden">
                 <img
                   src={`/video/${item.videoid.thumbnail}`}
                   alt="thumbnail"
@@ -69,18 +70,13 @@ export default function LikedVideosContent() {
             </Link>
 
             {/* Details */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pr-1">
               <Link href={`/watch/${item.videoid?._id}`}>
-                <h3 className="font-medium text-sm line-clamp-2 group-hover:text-blue-600 mb-1">
-                  {item.videoid?.title}
-                </h3>
+                <h3 className="font-medium text-sm sm:text-base line-clamp-2 break-words">
+             {item.videoid?.title}
+              </h3>
               </Link>
-
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {item.videoid?.videochannel}
-              </p>
-
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
                 {item.videoid?.views?.toLocaleString() || 0} views •{" "}
                 {item.videoid?.createdAt &&
                 !isNaN(new Date(item.videoid.createdAt).getTime())
@@ -101,33 +97,48 @@ export default function LikedVideosContent() {
                   : "Recently"}
               </p>
             </div>
-
             {/* Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="opacity-0 group-hover:opacity-100"
-                >
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() =>
-                    handleUnlikeVideo(
-                      item.videoid?._id,
-                      item._id
-                    )
-                  }
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Remove from liked videos
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <DropdownMenu
+  open={openMenu === item._id}
+  onOpenChange={(open) =>
+    setOpenMenu(open ? item._id : null)
+}
+>
+  <DropdownMenuTrigger asChild>
+    <Button
+      variant="ghost"
+      size="icon"
+      className="flex-shrink-0 opacity-100"
+    >
+      <MoreVertical className="w-4 h-4" />
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="end">
+    <div className="flex items-center gap-4 px-2 py-1">
+      <button
+        type="button"
+        onClick={() => setOpenMenu(null)}
+        className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+      >
+        <X className="w-5 h-5" />
+      </button>
+      {/* Remove - Unlike video */}
+      <button
+        type="button"
+        onClick={() => {
+          handleUnlikeVideo(
+            item.videoid?._id,
+            item._id
+          )
+          setOpenMenu(null)
+        }}
+        className="whitespace-nowrap rounded px-1 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
+      >
+        Remove from liked videos
+      </button>
+    </div>
+  </DropdownMenuContent>
+</DropdownMenu>
           </div>
         ))}
       </div>

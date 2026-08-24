@@ -2,10 +2,18 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/router";
 import { socket } from "@/lib/socket";
 import { createPeerConnection } from "@/lib/webrtc";
+import { useCall } from "@/lib/CallContext";
 import { ScreenShare, Mic, MicOff, Video, VideoOff, PhoneOff, Circle, } from "lucide-react";
 const CallPage = () => {
   const router = useRouter();
   const { roomId } = router.query;
+  const {
+  localStreamRef: globalLocalStreamRef,
+  remoteStreamRef: globalRemoteStreamRef,
+  peerConnectionRef: globalPeerConnectionRef,
+  setIsCallActive,
+  setRoomId,
+} = useCall();
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -18,6 +26,15 @@ const CallPage = () => {
   const [isCameraOff, setIsCameraOff] = useState(false);
 const startScreenShare = async () => {
   if (!peerConnectionRef.current) return;
+
+  if (
+    !navigator.mediaDevices ||
+    typeof navigator.mediaDevices.getDisplayMedia !== "function"
+  ) {
+    alert("Screen sharing is not supported on this mobile browser. Please use a desktop browser.");
+    return;
+  }
+
   try {
     const screenStream = await navigator.mediaDevices.getDisplayMedia({
       video: true,
@@ -43,8 +60,9 @@ const startScreenShare = async () => {
         localVideoRef.current.srcObject = localStreamRef.current;
       }
     };
-  } catch (err) {
-    console.error(err);
+  } catch (err: any) {
+    console.error("Screen Share Error:", err);
+    alert(`Screen Share failed: ${err?.name || "Unknown error"}`);
   }
 };
 const startRecording = () => {
@@ -118,15 +136,39 @@ useEffect(() => {
     if (!peer) return;
     peerConnectionRef.current = peer;
     peer.ontrack = (event) => {
-      console.log("Remote Track");
-      const remoteStream = event.streams[0];
-      if (
-        remoteVideoRef.current &&
-        remoteVideoRef.current.srcObject !== remoteStream
-      ) {
-        remoteVideoRef.current.srcObject = remoteStream;
-      }
-    };
+  console.log("Remote Track Received");
+
+  const [remoteStream] = event.streams;
+
+  if (!remoteStream) {
+    console.log("No remote stream received");
+    return;
+  }
+
+  globalRemoteStreamRef.current = remoteStream;
+
+  const remoteVideo = remoteVideoRef.current;
+
+  if (!remoteVideo) return;
+
+  const remoteTrack = event.track;
+
+  remoteTrack.onunmute = () => {
+    console.log("Remote Track Unmuted");
+
+    if (remoteVideo.srcObject !== remoteStream) {
+      remoteVideo.srcObject = remoteStream;
+    }
+
+    remoteVideo.play().catch((err) => {
+      console.error("Remote Video Play Error:", err);
+    });
+  };
+
+  if (remoteVideo.srcObject !== remoteStream) {
+    remoteVideo.srcObject = remoteStream;
+  }
+};
     peer.onicecandidate = (event) => {
       if (!event.candidate) return;
       socket.emit("ice-candidate", {
@@ -142,6 +184,7 @@ useEffect(() => {
             audio: true,
           });
         localStreamRef.current = stream;
+        globalLocalStreamRef.current = stream;
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = stream;
         }
@@ -242,27 +285,27 @@ const formatTime = (seconds: number) => {
   )}`;
 };
 const controlButton =
-  "w-28 h-20 rounded-2xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-white";
+  "w-[60px] h-[60px] sm:w-24 sm:h-20 rounded-xl sm:rounded-2xl bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition-all duration-200 flex flex-col items-center justify-center gap-1 sm:gap-2 text-white shrink-0";
   return (
     <div className="min-h-screen bg-black flex flex-col items-center justify-center gap-6 p-6">
-      <div className="relative w-full max-w-7xl h-[75vh] rounded-2xl overflow-hidden bg-zinc-900">
+      <div className="relative w-full max-w-7xl h-[75vh] sm:h-[75vh] rounded-2xl overflow-hidden bg-zinc-900">
         <video
           ref={localVideoRef}
           autoPlay
           playsInline
           muted
-          className="absolute bottom-8 right-8 w-72 rounded-2xl border-2 border-zinc-700 shadow-2xl bg-black object-cover z-10"/>
+          className="absolute top-4 right-3 sm:top-8 sm:right-8 w-28 h-40 sm:w-72 sm:h-auto rounded-xl sm:rounded-2xl border-2 border-zinc-700 shadow-2xl bg-black object-cover z-20"/>
         <video
           ref={remoteVideoRef}
           autoPlay
           playsInline
-          className="absolute inset-0 w-full h-full object-cover bg-black"/>
-          <div className="absolute bottom-6 left-[42%] -translate-x-1/2 flex gap-4">
+          className="absolute inset-0 w-full h-full object-contain sm:object-cover bg-black z-0"/>
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex flex-nowrap justify-center items-center gap-1 sm:gap-4">
         <button
   onClick={startScreenShare}
   className={controlButton}>
-  <ScreenShare size={28} />
-  <span className="text-sm font-medium">
+  <ScreenShare size={20} />
+  <span className="text-[8px] sm:text-sm font-medium">
     Share Screen
   </span>
 </button>
@@ -274,9 +317,9 @@ const controlButton =
       : ""
   }`}>
   <Circle
-    size={28}
+    size={20}
     className={isRecording ? "fill-red-500 text-red-500" : ""}/>
-  <span className="text-sm font-medium">
+  <span className="text-[8px] sm:text-sm font-medium">
   {isRecording ? "Recording" : "Record"}
 </span>
 {isRecording && (
@@ -293,11 +336,11 @@ const controlButton =
       : ""
   }`}>
   {isMicMuted ? (
-    <MicOff size={28} className="text-yellow-400" />
+    <MicOff size={20} className="text-yellow-400" />
   ) : (
-    <Mic size={28} />
+    <Mic size={20} />
   )}
-  <span className="text-sm font-medium">
+  <span className="text-[8px] sm:text-sm font-medium">
     {isMicMuted ? "Mic Off" : "Mic On"}
   </span>
 </button>
@@ -307,19 +350,19 @@ const controlButton =
     isCameraOff ? "border-yellow-500 bg-yellow-950/30" : ""
   }`}>
   {isCameraOff ? (
-    <VideoOff size={28} className="text-yellow-400" />
+    <VideoOff size={20} className="text-yellow-400" />
   ) : (
-    <Video size={28} />
+    <Video size={20} />
   )}
-  <span className="text-sm font-medium">
+  <span className="text-[8px] sm:text-sm font-medium">
     {isCameraOff ? "Camera Off" : "Camera On"}
   </span>
 </button>
 <button
   onClick={endCall}
-  className="w-28 h-20 rounded-2xl bg-red-600 hover:bg-red-700 transition-all duration-200 flex flex-col items-center justify-center gap-2 text-white">
-  <PhoneOff size={28} />
-  <span className="text-sm font-medium">
+  className="w-[60px] h-[60px] sm:w-24 sm:h-20 rounded-xl sm:rounded-2xl bg-red-600 hover:bg-red-700 transition-all duration-200 flex flex-col items-center justify-center gap-1 sm:gap-2 text-white shrink-0">
+  <PhoneOff size={20} />
+  <span className="text-[8px] sm:text-sm font-medium">
     End Call
   </span>
 </button>

@@ -48,7 +48,7 @@ const Downloads = () => {
       index===self.findIndex((v)=>v.videoid?._id===video.videoid?._id)
   );
   return (
-    <div className="mb-4">
+    <div className="mb-4 px-4 sm:px-6">
       <h1 className="text-xl font-semibold">Downloads</h1>
       <p className="text-sm text-gray-500">
         {videos.length} {videos.length === 1 ? "video" : "videos"}
@@ -60,51 +60,69 @@ const Downloads = () => {
           console.log(item.videoid)
           return (
           <div
-            key={item._id}
-            className="flex items-center gap-4 mb-4 cursor-pointer hover:bg-gray-100 p-2 rounded relative group"
-            onClick={() => router.push(`/watch/${item.videoid?._id}`)}
-          >
-            <img
-              src={`/video/${item.videoid?.thumbnail}`}
-              alt="thumbnail"
-              className="w-40 h-24 object-cover rounded-md shadow"
-            />
-            <div className="flex items-center w-full">
-              <div>
-                <h3 className="font-semibold">{item.videoid?.title}</h3>
-                <p className="text-sm text-gray-500">
-                  {item.videoid?.views} views •{" "}
-                  {formatTime(item.createdAt, time)}
-                </p>
-              </div>
-              <div
-                className="ml-auto opacity-0 group-hover:opacity-100 cursor-pointer px-2"
-                onClick={(e) => {
-                  e.stopPropagation()
-                  setActiveMenu(item._id)
-                }}
-              >
-                ⋮
-              </div>
-            </div>
-            {activeMenu === item._id && (
-              <div
-                className="absolute right-2 top-8 bg-white shadow-md rounded p-2 text-sm z-50"
-                onMouseLeave={() => setActiveMenu(null)}
-              >
-                <p
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    handleRemove(item._id)
-                  }}
-                  className="hover:bg-gray-100 p-1 rounded"
-                >
-                  <span className="text-gray-500 text-lg font-bold">✕         </span>
-                  Remove from downloads
-                </p>
-              </div>
-            )}
-          </div>
+  key={item._id}
+  className="flex w-full min-w-0 items-start gap-2 sm:gap-4 mb-4 cursor-pointer p-2 rounded relative group"
+  onClick={() => router.push(`/watch/${item.videoid?._id}`)}
+>
+  {/* Thumbnail */}
+  <img
+    src={`/video/${item.videoid?.thumbnail}`}
+    alt="thumbnail"
+    className="w-28 h-20 sm:w-40 sm:h-24 object-cover rounded-md shadow flex-shrink-0"
+  />
+  {/* Video Details */}
+  <div className="flex items-start min-w-0 flex-1">
+    <div className="min-w-0 flex-1">
+      <h3 className="font-semibold text-sm sm:text-base line-clamp-2 break-words">
+        {item.videoid?.title}
+      </h3>
+      <p className="text-xs sm:text-sm text-gray-500 truncate">
+        {item.videoid?.views?.toLocaleString()} views •{" "}
+        {formatTime(item.createdAt, time)}
+      </p>
+    </div>
+    {/* Three dots */}
+    <div
+      className="ml-1 flex-shrink-0 w-8 h-8 flex items-center justify-center opacity-100 cursor-pointer dark:text-white"
+      onClick={(e) => {
+        e.stopPropagation()
+        setActiveMenu(item._id)
+      }}
+    >
+      ⋮
+    </div>
+  </div>
+  {/* Remove menu */}
+  {activeMenu === item._id && (
+    <div
+      className="absolute right-2 top-10 bg-white shadow-md rounded p-2 text-sm z-50"
+      onMouseLeave={() => setActiveMenu(null)}
+    >
+      <div className="flex items-center gap-4">
+  <button
+    onClick={(e) => {
+      e.stopPropagation()
+      setActiveMenu(null)
+    }}
+    className="flex items-center gap-2 w-full hover:bg-gray-100 p-1 rounded dark:text-white"
+  >
+    <span className="text-gray-500 text-lg font-bold">
+      ✕
+    </span>
+  </button>
+  <button
+    onClick={(e) => {
+      e.stopPropagation()
+      handleRemove(item._id)
+    }}
+    className="hover:bg-gray-100 p-1 rounded dark:text-black text-left whitespace-nowrap"
+  >
+    Remove from downloads
+  </button>
+</div>
+    </div>
+  )}
+</div>
         )})
       )}
     </div>

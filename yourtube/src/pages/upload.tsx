@@ -17,7 +17,7 @@ export default function Upload() {
     formData.append("thumbnail", thumbnail);
     try {
       const res = await axios.post(
-        "http://localhost:5000/video/upload",
+        `${process.env.NEXT_PUBLIC_URL}/video/upload`,
         formData
       );
       console.log(res.data);

@@ -51,9 +51,15 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 flex h-14 items-center justify-between gap-2 border-b bg-white px-2 sm:px-4 dark:bg-black">
       <div className="flex items-center gap-2 flex-shrink-0">
-        <Button variant="ghost" size="icon">
-          <Menu className="w-6 h-6" />
-        </Button>
+        <Button
+  variant="ghost"
+  size="icon"
+  onClick={() => {
+    window.dispatchEvent(new Event("toggle-mobile-sidebar"));
+  }}
+>
+  <Menu className="w-6 h-6" />
+</Button>
         <Link href="/" className="flex items-center gap-1">
           <div className="bg-red-600 p-1 rounded">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
@@ -66,16 +72,16 @@ const Header = () => {
       </div>
       <form
         onSubmit={handleSearch}
-        className="mx-2 flex flex-1 items-center gap-2 max-w-2xl"
+        className="mx-2 flex flex-1 min-w-0 items-center gap-2 max-w-2xl"
       >
-        <div className="flex flex-1">
+        <div className="flex flex-1 min-w-0">
           <Input
             type="search"
             placeholder="Search"
             value={searchQuery}
             onKeyPress={handleKeypress}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-10 rounded-l-full border-r-0 text-sm focus-visible:ring-0"
+            className="h-10 min-w-0 flex-1 rounded-l-full border-r-0 text-sm focus-visible:ring-0"
           />
           <Button
             type="submit"

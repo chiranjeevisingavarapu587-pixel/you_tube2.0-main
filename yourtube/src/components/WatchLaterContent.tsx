@@ -18,6 +18,7 @@ export default function WatchLaterContent() {
   const router=useRouter();
   const [watchLater, setWatchLater] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { user } = useUser();
 
   useEffect(() => {
@@ -97,77 +98,102 @@ export default function WatchLaterContent() {
       </div>
 
       <div className="space-y-4">
-        {watchLater
-        .filter((item)=>item.videoid)
-        .map((item) => (
-          
-          <div key={item._id} className="flex gap-4 group">
-            {item.videoid?._id && (
-            <Link href={`/watch/${item.videoid._id}`} className="flex-shrink-0">
-              <div className="relative w-40 aspect-video bg-gray-100 rounded overflow-hidden">
-                <img
-                  src={`/video/${item.videoid.thumbnail}`}
-                  className="object-cover group-hover:scale-105 transition-transform duration-200"
-                />
-              </div>
+  {watchLater
+    .filter((item) => item.videoid)
+    .map((item) => (
+      <div
+        key={item._id}
+        className="flex w-full min-w-0 items-start gap-2 sm:gap-4 group"
+      >
+        {/* Thumbnail */}
+        {item.videoid?._id && (
+          <Link
+            href={`/watch/${item.videoid._id}`}
+            className="flex-shrink-0"
+          >
+            <div className="relative w-28 h-20 sm:w-40 sm:h-24 bg-gray-100 rounded overflow-hidden">
+              <img
+                src={`/video/${item.videoid.thumbnail}`}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              />
+            </div>
+          </Link>
+        )}
+        {/* Video Details */}
+        <div className="flex flex-col min-w-0 flex-1">
+          {item.videoid?._id && (
+            <Link href={`/watch/${item.videoid._id}`}>
+              <h3 className="font-medium text-sm sm:text-base line-clamp-2 break-words group-hover:text-blue-600 mb-1">
+                {item.videoid?.title}
+              </h3>
             </Link>
-            )}
-            <div className="flex-1 min-w-0">
-
-              {item.videoid?._id && (
-              <Link href={`/watch/${item.videoid._id}`}>
-                <h3 className="font-medium text-sm line-clamp-2 group-hover:text-blue-600 mb-1">
-                  {item.videoid?.title}
-                </h3>
-              </Link>
-              )}
-              <p className="text-sm text-gray-600">
-                {item.videoid?.chanel}
-              </p>
-              <p className="text-sm text-gray-600">
-                {item.videoid?.views?.toLocaleString()} views •{" "}
-                {item.videoid?.createdAt &&
-                !isNaN(new Date(item.videoid.createdAt).getTime())
-                  ? formatDistanceToNow(
+          )}
+          <p className="text-xs sm:text-sm text-gray-600 truncate">
+            {item.videoid?.channel}
+          </p>
+          <p className="text-xs sm:text-sm text-gray-600 truncate">
+            {item.videoid?.views?.toLocaleString()} views •{" "}
+            {item.videoid?.createdAt &&
+            !isNaN(new Date(item.videoid.createdAt).getTime())
+              ? formatDistanceToNow(
                   new Date(item.videoid.createdAt),
                   { addSuffix: true }
-                  )
-                  : "Recently"}
-              </p>
-              <p className="text-xs text-gray-500 mt-1">
-                Added{" "}
-                  {item.createdAt &&
-                  !isNaN(new Date(item.createdAt).getTime())
-                  ? formatDistanceToNow(
+                )
+              : "Recently"}
+          </p>
+          <p className="text-xs text-gray-500 mt-1 truncate">
+            Added{" "}
+            {item.createdAt &&
+            !isNaN(new Date(item.createdAt).getTime())
+              ? formatDistanceToNow(
                   new Date(item.createdAt),
                   { addSuffix: true }
-                  )
-                  : "Recently"}
-              </p>
-            </div>
+                )
+              : "Recently"}
+          </p>
+        </div>
+        {/* Three dots */}
+        <DropdownMenu
+  open={openMenu === item._id}
+  onOpenChange={(open) =>
+    setOpenMenu(open ? item._id : null)
+  }
+>
+  <DropdownMenuTrigger asChild>
+    <Button
+      variant="ghost"
+      size="icon"
+      className="flex-shrink-0 w-8 h-8 opacity-100"
+    >
+      <MoreVertical className="w-4 h-4" />
+    </Button>
+  </DropdownMenuTrigger>
+  <DropdownMenuContent align="end">
+    <div className="flex items-center gap-4 px-2 py-1">
+      <button
+        type="button"
+        onClick={() => setOpenMenu(null)}
+        className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+      >
+        <X className="w-5 h-5" />
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          handleRemoveFromWatchLater(item.videoid._id);
+          setOpenMenu(null);
+        }}
+        className="whitespace-nowrap rounded px-1 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-800"
+      >
+        Remove from Watch later
+      </button>
 
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="opacity-0 group-hover:opacity-100"
-                >
-                  <MoreVertical className="w-4 h-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  onClick={() => handleRemoveFromWatchLater(item.videoid._id)}
-                >
-                  <X className="w-4 h-4 mr-2" />
-                  Remove from Watch later
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        ))}
+    </div>
+  </DropdownMenuContent>
+</DropdownMenu>
       </div>
+    ))}
+</div>
     </div>
   );
 }

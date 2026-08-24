@@ -45,25 +45,6 @@ export const addDownload = async (req, res) => {
         message: "Free users can download only 1 video per day",
       });
     }
-    // BRONZE PLAN LIMIT
-    if (
-      currentPlan === "bronze" &&
-      downloadsToday.length >= 3
-    ) {
-      return res.status(403).json({
-        message: "Bronze limit reached",
-      });
-    }
-    // SILVER PLAN LIMIT
-    if (
-      currentPlan === "silver" &&
-      downloadsToday.length >= 10
-    ) {
-      return res.status(403).json({
-        message: "Silver limit reached",
-      });
-    }
-    // CHECK EXISTING DOWNLOAD
     // SAVE DOWNLOAD
     const newDownload = new Download({
       userId,

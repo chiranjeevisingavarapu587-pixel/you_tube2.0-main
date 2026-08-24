@@ -22,7 +22,7 @@ const file = new Video({
   thumbnail: thumbnailFile.path,
   filetype: videoFile.mimetype,
   filesize: videoFile.size,
-  videochanel: req.body.videochanel,
+  videochannel: req.body.videochannel,
   uploader: req.body.uploader,
 });
 console.log(file)

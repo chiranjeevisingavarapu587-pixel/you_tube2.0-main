@@ -90,7 +90,7 @@ const VideoInfo: React.FC<VideoInfoProps> = ({ video }) => {
         {/* LEFT SIDE */}
         <div className="flex items-center justify-between gap-4">
           <div>
-            <p className="font-semibold">{video.videochanel || video.videochannel || "Channel"}</p>
+            <p className="font-semibold">{video.videochannel || "Channel"}</p>
             <p className="text-sm text-gray-500">1.2M subscribers</p>
           </div>
           <button onClick={()=>alert("Subscribed")}
@@ -99,7 +99,7 @@ const VideoInfo: React.FC<VideoInfoProps> = ({ video }) => {
           </button>
         </div>
         {/* RIGHT SIDE BUTTONS */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex items-center gap-2 flex-nowrap shrink-0">
           {/* LIKE */}
           <button
             onClick={handleLike}
@@ -195,7 +195,7 @@ const VideoInfo: React.FC<VideoInfoProps> = ({ video }) => {
           </button>
           {/* MORE */}
           <button onClick={()=>alert("More options coming soon")}
-          className="p-2 rounded-full bg-gray-100 border border-gray-200 text-black dark:text-black">
+          className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 border border-gray-200 text-black dark:text-black">
             <MoreHorizontal size={18} />
           </button>
         </div>

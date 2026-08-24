@@ -58,7 +58,7 @@ const VideoUploader = ({ channelId, channelName }: any) => {
     formdata.append("file", videoFile);
     if (thumbnail) {formdata.append("thumbnail", thumbnail);}
     formdata.append("videotitle", videoTitle);
-    formdata.append("videochanel", channelName);
+    formdata.append("videochannel", channelName);
     formdata.append("uploader", channelId);
     console.log(formdata)
     console.log(thumbnail)

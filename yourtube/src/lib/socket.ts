@@ -1,6 +1,11 @@
 import { io } from "socket.io-client";
-console.log("Socket file loaded");
-export const socket = io("http://localhost:5000", {
+
+const host =
+  typeof window !== "undefined"
+    ? window.location.hostname
+    : "localhost";
+
+export const socket = io(`http://${host}:5000`, {
   transports: ["websocket"],
   autoConnect: true,
 });

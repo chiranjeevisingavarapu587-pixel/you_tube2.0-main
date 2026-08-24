@@ -1,31 +1,31 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import "dotenv/config";
-const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-});
-transporter.verify((err, success) => {
-  if (err) {
-    console.log("SMTP ERROR:", err);
-  } else {
-    console.log("SMTP READY");
-  }
-});
+
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 export const sendOTP = async (email, otp) => {
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Your Login OTP",
-    html: `
-      <h2>YouTube Clone Verification</h2>
-      <p>Your OTP is:</p>
-      <h1>${otp}</h1>
-      <p>This OTP is valid for 5 minutes.</p>
-    `,
-  });
+  try {
+    const { data, error } = await resend.emails.send({
+      from: "YouTube Clone <onboarding@resend.dev>",
+      to: [email],
+      subject: "Your Login OTP",
+      html: `
+        <h2>YouTube Clone Verification</h2>
+        <p>Your OTP is:</p>
+        <h1>${otp}</h1>
+        <p>This OTP is valid for 5 minutes.</p>
+      `,
+    });
+
+    if (error) {
+      console.log("EMAIL ERROR:", error);
+      throw new Error(error.message);
+    }
+
+    console.log("EMAIL SENT:", data?.id);
+    return data;
+  } catch (error) {
+    console.log("EMAIL ERROR:", error);
+    throw error;
+  }
 };
