@@ -1,11 +1,9 @@
 import { io } from "socket.io-client";
 
-const host =
-  typeof window !== "undefined"
-    ? window.location.hostname
-    : "localhost";
-
-export const socket = io(`http://${host}:5000`, {
-  transports: ["websocket"],
-  autoConnect: true,
-});
+export const socket = io(
+  process.env.NEXT_PUBLIC_BACKEND_URL as string,
+  {
+    transports: ["websocket"],
+    autoConnect: true,
+  }
+);
