@@ -11,6 +11,6 @@ routes.post("/upload", upload.fields([
 routes.get("/getall", getallvideo);
 routes.get("/search",searchVideos);
 routes.get("/stream/:filename", streamVideo);
-routes.get("/video/:filename", streamVideo)
+routes.get("/video/:filename", streamVideo);
 routes.get("/:id",getVideoById);
 export default routes;

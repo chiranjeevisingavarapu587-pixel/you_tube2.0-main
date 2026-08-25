@@ -37,7 +37,14 @@ console.log(file)
 // Get All Videos
 export const getallvideo = async (req, res) => {
   try {
+    console.log("DATABASE:", mongoose.connection.name);
+    console.log("MODEL COLLECTION:", Video.collection.name);
+
+    const count = await Video.countDocuments();
+    console.log("VIDEOS FOUND:", count);
+
     const files = await Video.find();
+
     return res.status(200).json({ videos: files });
   } catch (error) {
     console.error(error);
