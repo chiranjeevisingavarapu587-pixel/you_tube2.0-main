@@ -24,7 +24,10 @@ export const handlelike = async (req, res) => {
 };
 export const getallLikedVideo = async (req, res) => {
   const { userId } = req.params;
+
   try {
+    console.log("LIKED VIDEOS USER ID:", userId);
+
     const likevideo = await like
       .find({ viewer: userId })
       .populate({
@@ -32,15 +35,17 @@ export const getallLikedVideo = async (req, res) => {
         model: "videofiles",
       })
       .lean();
-      const formatted=
-      likevideo.map(item=>({
-        ...item,
-        videoid: item.videoid,
-      }));
-    return res.status(200).json(formatted);
+
+    console.log("LIKED VIDEOS RESULT:", likevideo);
+
+    return res.status(200).json(likevideo);
   } catch (error) {
-    console.error(" error:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    console.error("GET LIKED VIDEOS ERROR:", error);
+
+    return res.status(500).json({
+      message: "Something went wrong",
+      error: error.message,
+    });
   }
 };
 export const handleUnlikeVideo = async (req, res) => {
